@@ -149,6 +149,8 @@ WEBHOOK_URL=https://ton-domaine.com/webhook
 COMPANY_DESCRIPTION=Entreprise qui reçoit des demandes de rendez-vous par téléphone.
 AGENT_FIRST_MESSAGE=Bonjour, je suis l'assistant de rendez-vous. Comment puis-je vous aider ?
 ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
+VAPI_MODEL_PROVIDER=deepseek
+VAPI_MODEL_NAME=deepseek-v4-flash
 AIRTABLE_API_KEY=ton-token-airtable
 AIRTABLE_BASE_ID=appxxxxxxxxxxxxxx
 AIRTABLE_APPOINTMENTS_TABLE=Rendez-vous
@@ -185,7 +187,8 @@ py -3.11 setup_vapi.py
 
 Le script crée un assistant avec :
 
-- modèle OpenAI `gpt-4o`
+- modèle configurable via `VAPI_MODEL_PROVIDER` et `VAPI_MODEL_NAME`
+- par défaut : `deepseek` / `deepseek-v4-flash`
 - transcription Deepgram `nova-2` en français
 - voix ElevenLabs `eleven_multilingual_v2`
 - tools `verifier_disponibilites` et `reserver_creneau`

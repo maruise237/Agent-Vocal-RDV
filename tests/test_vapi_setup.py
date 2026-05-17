@@ -10,12 +10,16 @@ def test_build_assistant_payload_contains_webhook_and_tools():
         first_message="Bonjour, comment puis-je vous aider ?",
         webhook_url="https://agent.example.com/webhook",
         voice_id="voice-123",
+        model_provider="deepseek",
+        model_name="deepseek-v4-flash",
     )
 
     tools = payload["model"]["tools"]
     tool_names = [tool["function"]["name"] for tool in tools]
 
     assert payload["serverUrl"] == "https://agent.example.com/webhook"
+    assert payload["model"]["provider"] == "deepseek"
+    assert payload["model"]["model"] == "deepseek-v4-flash"
     assert payload["voice"]["voiceId"] == "voice-123"
     assert "verifier_disponibilites" in tool_names
     assert "reserver_creneau" in tool_names

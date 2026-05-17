@@ -55,14 +55,16 @@ def build_assistant_payload(
     first_message: str,
     webhook_url: str,
     voice_id: str,
+    model_provider: str,
+    model_name: str,
 ) -> dict[str, Any]:
     return {
         "name": f"Agent RDV - {company_name}",
         "firstMessage": first_message,
         "serverUrl": webhook_url,
         "model": {
-            "provider": "openai",
-            "model": "gpt-4o",
+            "provider": model_provider,
+            "model": model_name,
             "messages": [
                 {
                     "role": "system",
@@ -144,6 +146,8 @@ def main() -> None:
         ),
         webhook_url=os.environ["WEBHOOK_URL"],
         voice_id=os.environ.get("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM"),
+        model_provider=os.environ.get("VAPI_MODEL_PROVIDER", "deepseek"),
+        model_name=os.environ.get("VAPI_MODEL_NAME", "deepseek-v4-flash"),
     )
 
     assistant = VapiClient(private_key).create_assistant(payload)
