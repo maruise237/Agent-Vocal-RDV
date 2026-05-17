@@ -1,0 +1,1248 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Centre de contrôle Agent Vocal RDV pour suivre les rendez-vous et gérer les disponibilités."
+    />
+    <title>Agent Vocal RDV - Centre de contrôle</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --font-sans: "Aptos", "Segoe UI", system-ui, -apple-system, sans-serif;
+        --font-mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+
+        --color-ink: oklch(0.18 0.018 235);
+        --color-ink-soft: oklch(0.42 0.018 235);
+        --color-ink-muted: oklch(0.56 0.014 235);
+        --color-paper: oklch(0.982 0.006 225);
+        --color-panel: #ffffff;
+        --color-panel-soft: oklch(0.965 0.012 220);
+        --color-panel-inset: oklch(0.945 0.012 220);
+        --color-line: oklch(0.84 0.018 230);
+        --color-line-soft: oklch(0.91 0.012 230);
+        --color-accent: oklch(0.48 0.12 178);
+        --color-accent-hover: oklch(0.41 0.12 178);
+        --color-accent-soft: oklch(0.93 0.045 178);
+        --color-success: oklch(0.48 0.13 150);
+        --color-success-soft: oklch(0.94 0.055 150);
+        --color-warning: oklch(0.65 0.13 74);
+        --color-warning-soft: oklch(0.95 0.07 74);
+        --color-danger: oklch(0.52 0.17 28);
+        --color-danger-soft: oklch(0.95 0.055 28);
+        --color-info: oklch(0.48 0.12 245);
+        --color-info-soft: oklch(0.94 0.045 245);
+
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 20px;
+        --space-6: 24px;
+        --space-8: 32px;
+        --space-10: 40px;
+
+        --radius-sm: 5px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-full: 999px;
+        --shadow-panel:
+          0 0 0 1px oklch(0 0 0 / 0.035),
+          0 10px 28px oklch(0.22 0.03 230 / 0.08);
+        --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        background:
+          linear-gradient(180deg, oklch(0.98 0.01 220), var(--color-paper) 34%),
+          var(--color-paper);
+        color: var(--color-ink);
+        font: 14px/1.5 var(--font-sans);
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button,
+      select {
+        cursor: pointer;
+      }
+
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .skip-link {
+        background: var(--color-accent);
+        color: #fff;
+        inset-block-start: var(--space-3);
+        inset-inline-start: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        position: fixed;
+        transform: translateY(-160%);
+        z-index: 20;
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+
+      .app-frame {
+        min-height: 100dvh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: var(--space-4);
+        align-items: center;
+        min-height: 72px;
+        padding: var(--space-4) clamp(var(--space-4), 4vw, var(--space-10));
+        border-block-end: 1px solid var(--color-line-soft);
+        background: oklch(1 0 0 / 0.86);
+        backdrop-filter: blur(18px) saturate(1.4);
+      }
+
+      .brand {
+        display: flex;
+        gap: var(--space-3);
+        align-items: center;
+        min-width: 0;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: var(--radius-lg);
+        background: var(--color-accent-soft);
+        color: var(--color-accent-hover);
+        font: 700 17px/1 var(--font-mono);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-block: 0;
+      }
+
+      h1 {
+        font-size: clamp(20px, 1.2vw + 16px, 28px);
+        line-height: 1.1;
+        font-weight: 720;
+      }
+
+      h2 {
+        font-size: 17px;
+        line-height: 1.2;
+      }
+
+      h3 {
+        font-size: 14px;
+      }
+
+      .eyebrow,
+      .metric-label,
+      .table th {
+        color: var(--color-ink-muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .muted {
+        color: var(--color-ink-muted);
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-3);
+      }
+
+      .status-chip,
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 28px;
+        border-radius: var(--radius-full);
+        padding: 0 var(--space-3);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .status-chip {
+        border: 1px solid var(--color-line);
+        background: var(--color-panel);
+        color: var(--color-ink-soft);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: var(--radius-full);
+        background: var(--color-warning);
+      }
+
+      .status-chip.connected .status-dot {
+        background: var(--color-success);
+      }
+
+      .shell {
+        width: min(1440px, 100%);
+        margin-inline: auto;
+        padding: var(--space-6) clamp(var(--space-4), 4vw, var(--space-10)) var(--space-10);
+      }
+
+      .control-strip {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+        gap: var(--space-4);
+        align-items: stretch;
+        margin-block-end: var(--space-5);
+      }
+
+      .briefing,
+      .auth-card,
+      .panel,
+      .metric-card {
+        background: var(--color-panel);
+        border: 1px solid var(--color-line-soft);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-panel);
+      }
+
+      .briefing {
+        display: grid;
+        gap: var(--space-3);
+        padding: var(--space-5);
+      }
+
+      .briefing-grid {
+        display: grid;
+        gap: var(--space-3);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .briefing-item {
+        border-radius: var(--radius-md);
+        background: var(--color-panel-soft);
+        padding: var(--space-3);
+      }
+
+      .auth-card {
+        display: grid;
+        gap: var(--space-3);
+        padding: var(--space-4);
+      }
+
+      .field {
+        display: grid;
+        gap: var(--space-2);
+      }
+
+      label {
+        color: var(--color-ink-soft);
+        font-weight: 650;
+      }
+
+      input,
+      select {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-md);
+        background: var(--color-panel-inset);
+        color: var(--color-ink);
+        padding: 0 var(--space-3);
+        transition:
+          border-color 150ms var(--ease-standard),
+          box-shadow 150ms var(--ease-standard),
+          background-color 150ms var(--ease-standard);
+      }
+
+      input:focus,
+      select:focus {
+        border-color: var(--color-accent);
+        background: #fff;
+        box-shadow: 0 0 0 4px oklch(0.48 0.12 178 / 0.13);
+        outline: none;
+      }
+
+      .button {
+        min-height: 42px;
+        border: 0;
+        border-radius: var(--radius-md);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        padding: 0 var(--space-4);
+        font-weight: 750;
+        transition:
+          transform 120ms var(--ease-standard),
+          background-color 150ms var(--ease-standard),
+          box-shadow 150ms var(--ease-standard);
+      }
+
+      .button:active {
+        transform: translateY(1px) scale(0.99);
+      }
+
+      .button-primary {
+        background: var(--color-accent);
+        color: #fff;
+        box-shadow: 0 10px 20px oklch(0.48 0.12 178 / 0.16);
+      }
+
+      .button-primary:hover {
+        background: var(--color-accent-hover);
+      }
+
+      .button-secondary {
+        border: 1px solid var(--color-line);
+        background: var(--color-panel);
+        color: var(--color-ink);
+      }
+
+      .button-secondary:hover {
+        background: var(--color-panel-soft);
+      }
+
+      .inline-status {
+        min-height: 22px;
+        color: var(--color-ink-muted);
+      }
+
+      .inline-status.error {
+        color: var(--color-danger);
+      }
+
+      .inline-status.success {
+        color: var(--color-success);
+      }
+
+      .dashboard-grid {
+        display: grid;
+        gap: var(--space-4);
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+      }
+
+      .metrics {
+        display: grid;
+        gap: var(--space-4);
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .metric-card {
+        display: grid;
+        gap: var(--space-3);
+        min-height: 124px;
+        padding: var(--space-4);
+      }
+
+      .metric-card strong {
+        font: 750 34px/1 var(--font-mono);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .metric-detail {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        color: var(--color-ink-soft);
+      }
+
+      .panel {
+        overflow: clip;
+      }
+
+      .appointments-panel {
+        grid-column: span 8;
+      }
+
+      .availability-panel {
+        grid-column: span 4;
+      }
+
+      .panel-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: var(--space-3);
+        align-items: center;
+        padding: var(--space-4);
+        border-block-end: 1px solid var(--color-line-soft);
+      }
+
+      .panel-toolbar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 760px;
+      }
+
+      .table th,
+      .table td {
+        padding: 13px var(--space-4);
+        border-block-end: 1px solid var(--color-line-soft);
+        text-align: start;
+        vertical-align: middle;
+      }
+
+      .table th {
+        background: var(--color-panel-soft);
+      }
+
+      .table tr:hover td {
+        background: oklch(0.97 0.012 220);
+      }
+
+      .client-cell {
+        display: grid;
+        gap: 2px;
+      }
+
+      .client-cell strong {
+        font-weight: 750;
+      }
+
+      .mono {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .badge {
+        min-height: 26px;
+        justify-content: center;
+      }
+
+      .badge.confirmed {
+        background: var(--color-success-soft);
+        color: var(--color-success);
+      }
+
+      .badge.done {
+        background: var(--color-info-soft);
+        color: var(--color-info);
+      }
+
+      .badge.cancelled {
+        background: var(--color-danger-soft);
+        color: var(--color-danger);
+      }
+
+      .availability-list {
+        display: grid;
+        gap: var(--space-3);
+        padding: var(--space-4);
+      }
+
+      .availability-actions {
+        display: grid;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        border-block-end: 1px solid var(--color-line-soft);
+        background: var(--color-panel-soft);
+      }
+
+      .preset-group,
+      .day-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+      }
+
+      .availability-preset,
+      .day-toggle,
+      .icon-button {
+        min-height: 36px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-md);
+        background: var(--color-panel);
+        color: var(--color-ink-soft);
+        font-weight: 750;
+        transition:
+          background-color 150ms var(--ease-standard),
+          border-color 150ms var(--ease-standard),
+          color 150ms var(--ease-standard),
+          transform 120ms var(--ease-standard);
+      }
+
+      .availability-preset {
+        padding: 0 var(--space-3);
+      }
+
+      .day-toggle {
+        width: 40px;
+        padding: 0;
+      }
+
+      .availability-preset:hover,
+      .day-toggle:hover,
+      .icon-button:hover {
+        border-color: var(--color-accent);
+        color: var(--color-accent-hover);
+      }
+
+      .availability-preset:active,
+      .day-toggle:active,
+      .icon-button:active {
+        transform: translateY(1px) scale(0.99);
+      }
+
+      .day-toggle.active {
+        border-color: var(--color-accent);
+        background: var(--color-accent-soft);
+        color: var(--color-accent-hover);
+      }
+
+      .availability-row {
+        display: grid;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        border: 1px solid var(--color-line-soft);
+        border-radius: var(--radius-lg);
+        background: var(--color-panel-soft);
+      }
+
+      .availability-row-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: var(--space-3);
+      }
+
+      .availability-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-3);
+      }
+
+      .days-field {
+        grid-column: 1 / -1;
+      }
+
+      .availability-help {
+        color: var(--color-ink-muted);
+        font-size: 13px;
+      }
+
+      .availability-warning {
+        color: var(--color-danger);
+        font-weight: 650;
+      }
+
+      .row-actions {
+        display: flex;
+        gap: var(--space-2);
+      }
+
+      .icon-button {
+        min-width: 36px;
+        padding: 0 var(--space-2);
+      }
+
+      .empty-state {
+        display: grid;
+        place-items: center;
+        min-height: 220px;
+        padding: var(--space-8);
+        color: var(--color-ink-muted);
+        text-align: center;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @media (max-width: 1100px) {
+        .control-strip,
+        .briefing-grid,
+        .metrics {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .appointments-panel,
+        .availability-panel {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .topbar,
+        .control-strip,
+        .briefing-grid,
+        .metrics,
+        .panel-header,
+        .availability-fields {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar-actions,
+        .panel-toolbar {
+          justify-content: stretch;
+          flex-wrap: wrap;
+        }
+
+        .button,
+        .status-chip {
+          width: 100%;
+        }
+
+        .table {
+          min-width: 0;
+        }
+
+        .table thead {
+          display: none;
+        }
+
+        .table,
+        .table tbody,
+        .table tr,
+        .table td {
+          display: block;
+        }
+
+        .table tr {
+          padding: var(--space-3) var(--space-4);
+          border-block-end: 1px solid var(--color-line-soft);
+        }
+
+        .table td {
+          border: 0;
+          padding: var(--space-2) 0;
+        }
+
+        .table td::before {
+          content: attr(data-label);
+          display: block;
+          color: var(--color-ink-muted);
+          font-size: 12px;
+          font-weight: 750;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Aller au contenu</a>
+
+    <div id="dashboard-root" class="app-frame">
+      <header class="topbar">
+        <div class="brand" aria-label="Agent Vocal RDV">
+          <div class="brand-mark" aria-hidden="true">AV</div>
+          <div>
+            <p class="eyebrow">Centre de contrôle</p>
+            <h1>Agent Vocal RDV</h1>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <span class="status-chip" id="connection-status" role="status" aria-live="polite">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="connection-label">Verrouillé</span>
+          </span>
+          <span class="status-chip mono" id="last-sync" aria-label="Dernière synchronisation">--:--</span>
+        </div>
+      </header>
+
+      <main class="shell" id="main-content">
+        <section class="control-strip" aria-label="Accès et résumé">
+          <div class="briefing">
+            <div>
+              <p class="eyebrow">Vue opérateur</p>
+              <h2>Suivre les appels transformés en rendez-vous</h2>
+              <p class="muted">
+                Consulte les réservations, vérifie les statuts et ajuste les plages de disponibilité depuis une seule page.
+              </p>
+            </div>
+
+            <div class="briefing-grid">
+              <div class="briefing-item">
+                <p class="eyebrow">Source</p>
+                <strong>Service local</strong>
+                <p class="muted">Prêt pour Airtable</p>
+              </div>
+              <div class="briefing-item">
+                <p class="eyebrow">Agenda</p>
+                <strong>Préparé</strong>
+                <p class="muted">Prêt pour Calendar</p>
+              </div>
+              <div class="briefing-item">
+                <p class="eyebrow">Déploiement</p>
+                <strong>Dokploy</strong>
+                <p class="muted">Docker port 8000</p>
+              </div>
+            </div>
+          </div>
+
+          <form class="auth-card" id="login-form">
+            <div>
+              <p class="eyebrow">Accès sécurisé</p>
+              <h2>Déverrouiller le dashboard</h2>
+            </div>
+            <label class="field">
+              Mot de passe
+              <input
+                id="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Mot de passe dashboard"
+              />
+            </label>
+            <button class="button button-primary" type="submit">Déverrouiller</button>
+            <p class="inline-status" id="feedback" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="dashboard-grid" aria-label="Pilotage">
+          <div class="metrics" aria-label="Statistiques rendez-vous">
+            <article class="metric-card">
+              <p class="metric-label">Total</p>
+              <strong id="stat-total">0</strong>
+              <p class="metric-detail">Rendez-vous reçus <span class="mono" id="stat-total-note">local</span></p>
+            </article>
+            <article class="metric-card">
+              <p class="metric-label">Confirmés</p>
+              <strong id="stat-confirmed">0</strong>
+              <p class="metric-detail">À venir ou actifs <span class="badge confirmed">OK</span></p>
+            </article>
+            <article class="metric-card">
+              <p class="metric-label">Terminés</p>
+              <strong id="stat-done">0</strong>
+              <p class="metric-detail">Historique traité <span class="badge done">Suivi</span></p>
+            </article>
+            <article class="metric-card">
+              <p class="metric-label">Confirmation</p>
+              <strong id="stat-rate">0%</strong>
+              <p class="metric-detail">Taux actuel <span class="mono" id="stat-rate-note">--</span></p>
+            </article>
+          </div>
+
+          <section class="panel appointments-panel" aria-labelledby="appointments-title">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Pipeline RDV</p>
+                <h2 id="appointments-title">Rendez-vous</h2>
+              </div>
+              <div class="panel-toolbar">
+                <label class="sr-only" for="status-filter">Filtrer par statut</label>
+                <select id="status-filter">
+                  <option value="Tous">Tous les statuts</option>
+                  <option value="Confirme">Confirmés</option>
+                  <option value="Termine">Terminés</option>
+                  <option value="Annule">Annulés</option>
+                </select>
+                <button class="button button-secondary" id="refresh-dashboard" type="button">Rafraîchir</button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Client</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Besoin</th>
+                    <th scope="col">Statut</th>
+                  </tr>
+                </thead>
+                <tbody id="appointments-body">
+                  <tr>
+                    <td colspan="4">
+                      <div class="empty-state">
+                        Déverrouille le dashboard pour charger les rendez-vous.
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel availability-panel" aria-labelledby="availability-title">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Agenda</p>
+                <h2 id="availability-title">Disponibilités</h2>
+              </div>
+              <div class="panel-toolbar">
+                <button class="button button-secondary" id="add-availability" type="button">Ajouter une plage</button>
+                <button class="button button-primary" id="save-availability" type="button">Sauvegarder</button>
+              </div>
+            </div>
+            <div class="availability-actions" aria-label="Presets de disponibilité">
+              <div>
+                <p class="eyebrow">Presets rapides</p>
+                <p class="availability-help">Applique un rythme courant à la plage sélectionnée ou à la première plage.</p>
+              </div>
+              <div class="preset-group">
+                <button class="availability-preset" type="button" data-preset="weekdays">Lun-Ven</button>
+                <button class="availability-preset" type="button" data-preset="weekend">Week-end</button>
+                <button class="availability-preset" type="button" data-preset="all">Tous les jours</button>
+                <button class="availability-preset" type="button" data-preset="morning">Matin</button>
+                <button class="availability-preset" type="button" data-preset="afternoon">Après-midi</button>
+              </div>
+            </div>
+            <div class="availability-list" id="availability-list">
+              <div class="empty-state">Les créneaux apparaîtront après déverrouillage.</div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const state = {
+        password: localStorage.getItem("dashboardPassword") || "",
+        appointments: [],
+        availability: [],
+      };
+
+      const els = {
+        form: document.querySelector("#login-form"),
+        password: document.querySelector("#password"),
+        feedback: document.querySelector("#feedback"),
+        status: document.querySelector("#connection-status"),
+        statusLabel: document.querySelector("#connection-label"),
+        lastSync: document.querySelector("#last-sync"),
+        tbody: document.querySelector("#appointments-body"),
+        filter: document.querySelector("#status-filter"),
+        availability: document.querySelector("#availability-list"),
+        saveAvailability: document.querySelector("#save-availability"),
+        addAvailability: document.querySelector("#add-availability"),
+        refresh: document.querySelector("#refresh-dashboard"),
+        total: document.querySelector("#stat-total"),
+        confirmed: document.querySelector("#stat-confirmed"),
+        done: document.querySelector("#stat-done"),
+        rate: document.querySelector("#stat-rate"),
+        rateNote: document.querySelector("#stat-rate-note"),
+      };
+
+      els.password.value = state.password;
+
+      function apiHeaders() {
+        return {
+          "Content-Type": "application/json",
+          "X-Dashboard-Password": state.password,
+        };
+      }
+
+      function setFeedback(message, type = "") {
+        els.feedback.textContent = message;
+        els.feedback.className = `inline-status ${type}`;
+      }
+
+      function setConnected(isConnected) {
+        els.status.classList.toggle("connected", isConnected);
+        els.statusLabel.textContent = isConnected ? "Connecté" : "Verrouillé";
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function statusBadge(status) {
+        const className =
+          status === "Confirme" ? "confirmed" : status === "Termine" ? "done" : "cancelled";
+        return `<span class="badge ${className}">${escapeHtml(status)}</span>`;
+      }
+
+      const dayOptions = [
+        ["0", "Lun"],
+        ["1", "Mar"],
+        ["2", "Mer"],
+        ["3", "Jeu"],
+        ["4", "Ven"],
+        ["5", "Sam"],
+        ["6", "Dim"],
+      ];
+
+      function buildHourOptions(selectedHour) {
+        return Array.from({ length: 19 }, (_, index) => index + 6)
+          .map((hour) => {
+            const label = `${String(hour).padStart(2, "0")}:00`;
+            const selected = Number(selectedHour) === hour ? "selected" : "";
+            return `<option value="${hour}" ${selected}>${label}</option>`;
+          })
+          .join("");
+      }
+
+      function selectedDaysLabel(days) {
+        if (days.length === 5 && days.every((day) => day >= 0 && day <= 4)) return "Lun-Ven";
+        if (days.length === 2 && days.includes(5) && days.includes(6)) return "Week-end";
+        if (days.length === 7) return "Tous les jours";
+        return days
+          .map((day) => dayOptions.find(([value]) => Number(value) === day)?.[1])
+          .filter(Boolean)
+          .join(", ");
+      }
+
+      function validateAvailabilityDraft(windows) {
+        const errors = [];
+
+        windows.forEach((windowItem, index) => {
+          if (!windowItem.label) {
+            errors.push(`Plage ${index + 1}: ajoute un libellé.`);
+          }
+          if (!windowItem.jours.length) {
+            errors.push(`Plage ${index + 1}: sélectionne au moins un jour.`);
+          }
+          if (windowItem.fin <= windowItem.debut) {
+            errors.push(`Plage ${index + 1}: l'heure de fin doit être après le début.`);
+          }
+        });
+
+        return errors;
+      }
+
+      function renderMetrics() {
+        const total = state.appointments.length;
+        const confirmed = state.appointments.filter((item) => item.status === "Confirme").length;
+        const done = state.appointments.filter((item) => item.status === "Termine").length;
+        const rate = total ? Math.round((confirmed / total) * 100) : 0;
+
+        els.total.textContent = total;
+        els.confirmed.textContent = confirmed;
+        els.done.textContent = done;
+        els.rate.textContent = `${rate}%`;
+        els.rateNote.textContent = total ? `${confirmed}/${total}` : "--";
+      }
+
+      function renderAppointments() {
+        const filter = els.filter.value;
+        const rows = state.appointments.filter((item) => filter === "Tous" || item.status === filter);
+
+        if (!rows.length) {
+          els.tbody.innerHTML = `
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">Aucun rendez-vous ne correspond à ce filtre.</div>
+              </td>
+            </tr>
+          `;
+          renderMetrics();
+          return;
+        }
+
+        els.tbody.innerHTML = rows
+          .map(
+            (item) => `
+              <tr>
+                <td data-label="Client">
+                  <div class="client-cell">
+                    <strong>${escapeHtml(item.first_name)} ${escapeHtml(item.last_name)}</strong>
+                    <span class="muted">${escapeHtml(item.email)}</span>
+                  </div>
+                </td>
+                <td data-label="Date" class="mono">${escapeHtml(item.date_rdv)}</td>
+                <td data-label="Besoin">${escapeHtml(item.besoin)}</td>
+                <td data-label="Statut">${statusBadge(item.status)}</td>
+              </tr>
+            `,
+          )
+          .join("");
+
+        renderMetrics();
+      }
+
+      function renderAvailability() {
+        if (!state.availability.length) {
+          els.availability.innerHTML = `<div class="empty-state">Aucune plage configurée. Ajoute une plage pour commencer.</div>`;
+          return;
+        }
+
+        els.availability.innerHTML = state.availability
+          .map(
+            (item, index) => `
+              <article class="availability-row" data-index="${index}">
+                <div class="availability-row-header">
+                  <div>
+                    <p class="eyebrow">Plage ${index + 1}</p>
+                    <h3>${escapeHtml(item.label)}</h3>
+                    <p class="availability-help">${escapeHtml(selectedDaysLabel(item.jours))}</p>
+                  </div>
+                  <div class="row-actions">
+                    <span class="badge confirmed">${escapeHtml(item.debut)}h-${escapeHtml(item.fin)}h</span>
+                    <button class="icon-button" type="button" data-action="duplicate" aria-label="Dupliquer la plage ${index + 1}">Copier</button>
+                    <button class="icon-button" type="button" data-action="remove" aria-label="Supprimer la plage ${index + 1}">Retirer</button>
+                  </div>
+                </div>
+                <div class="availability-fields">
+                  <div class="field days-field">
+                    <label>Jours actifs</label>
+                    <div class="day-selector" role="group" aria-label="Jours actifs pour ${escapeHtml(item.label)}">
+                      ${dayOptions
+                        .map(([value, label]) => {
+                          const isActive = item.jours.includes(Number(value));
+                          return `
+                            <button
+                              class="day-toggle ${isActive ? "active" : ""}"
+                              type="button"
+                              data-day="${value}"
+                              aria-pressed="${isActive ? "true" : "false"}"
+                            >${label}</button>
+                          `;
+                        })
+                        .join("")}
+                    </div>
+                  </div>
+                  <label class="field">
+                    Début
+                    <select data-field="debut">${buildHourOptions(item.debut)}</select>
+                  </label>
+                  <label class="field">
+                    Fin
+                    <select data-field="fin">${buildHourOptions(item.fin)}</select>
+                  </label>
+                  <label class="field days-field">
+                    Libellé
+                    <input value="${escapeHtml(item.label)}" data-field="label" />
+                  </label>
+                </div>
+              </article>
+            `,
+          )
+          .join("");
+      }
+
+      async function loadDashboard() {
+        setFeedback("Chargement des données...");
+
+        const [appointmentsResponse, availabilityResponse] = await Promise.all([
+          fetch("/api/appointments", { headers: apiHeaders() }),
+          fetch("/api/availability", { headers: apiHeaders() }),
+        ]);
+
+        if (!appointmentsResponse.ok || !availabilityResponse.ok) {
+          setConnected(false);
+          throw new Error("Mot de passe invalide ou API indisponible.");
+        }
+
+        state.appointments = await appointmentsResponse.json();
+        state.availability = await availabilityResponse.json();
+        renderAppointments();
+        renderAvailability();
+        setConnected(true);
+        els.lastSync.textContent = new Date().toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        setFeedback("Dashboard synchronisé.", "success");
+      }
+
+      function readAvailabilityForm() {
+        return [...document.querySelectorAll(".availability-row")].map((row, index) => {
+          const get = (field) => row.querySelector(`[data-field="${field}"]`).value;
+          const jours = [...row.querySelectorAll(".day-toggle.active")].map((button) =>
+            Number(button.dataset.day),
+          );
+          return {
+            id: state.availability[index]?.id || `window-${index + 1}`,
+            label: get("label").trim(),
+            jours,
+            debut: Number(get("debut")),
+            fin: Number(get("fin")),
+          };
+        });
+      }
+
+      function syncAvailabilityDraft() {
+        state.availability = readAvailabilityForm();
+      }
+
+      function applyPreset(preset) {
+        if (!state.availability.length) {
+          state.availability.push({
+            id: "window-1",
+            label: "Semaine",
+            jours: [0, 1, 2, 3, 4],
+            debut: 9,
+            fin: 17,
+          });
+        } else {
+          syncAvailabilityDraft();
+        }
+
+        const target = state.availability[0];
+
+        const presets = {
+          weekdays: { label: "Semaine", jours: [0, 1, 2, 3, 4] },
+          weekend: { label: "Week-end", jours: [5, 6] },
+          all: { label: "Tous les jours", jours: [0, 1, 2, 3, 4, 5, 6] },
+          morning: { label: target.label || "Matin", debut: 8, fin: 12 },
+          afternoon: { label: target.label || "Après-midi", debut: 14, fin: 18 },
+        };
+
+        Object.assign(target, presets[preset]);
+        renderAvailability();
+        setFeedback("Preset appliqué. Pense à sauvegarder.", "success");
+      }
+
+      function addAvailabilityWindow() {
+        syncAvailabilityDraft();
+        state.availability.push({
+          id: `window-${Date.now()}`,
+          label: `Nouvelle plage ${state.availability.length + 1}`,
+          jours: [0, 1, 2, 3, 4],
+          debut: 9,
+          fin: 17,
+        });
+        renderAvailability();
+      }
+
+      els.form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        state.password = els.password.value;
+        localStorage.setItem("dashboardPassword", state.password);
+
+        try {
+          await loadDashboard();
+        } catch (error) {
+          setFeedback(error.message, "error");
+        }
+      });
+
+      els.refresh.addEventListener("click", () => {
+        loadDashboard().catch((error) => setFeedback(error.message, "error"));
+      });
+
+      els.filter.addEventListener("change", renderAppointments);
+
+      els.addAvailability.addEventListener("click", addAvailabilityWindow);
+
+      document.querySelectorAll(".availability-preset").forEach((button) => {
+        button.addEventListener("click", () => applyPreset(button.dataset.preset));
+      });
+
+      els.availability.addEventListener("click", (event) => {
+        const button = event.target.closest("button");
+        if (!button) return;
+
+        const row = button.closest(".availability-row");
+        const index = Number(row?.dataset.index);
+
+        if (button.classList.contains("day-toggle")) {
+          button.classList.toggle("active");
+          button.setAttribute("aria-pressed", button.classList.contains("active") ? "true" : "false");
+          syncAvailabilityDraft();
+          renderAvailability();
+          return;
+        }
+
+        if (button.dataset.action === "duplicate") {
+          syncAvailabilityDraft();
+          const source = state.availability[index];
+          state.availability.splice(index + 1, 0, {
+            ...source,
+            id: `window-${Date.now()}`,
+            label: `${source.label} copie`,
+          });
+          renderAvailability();
+        }
+
+        if (button.dataset.action === "remove") {
+          syncAvailabilityDraft();
+          state.availability.splice(index, 1);
+          renderAvailability();
+        }
+      });
+
+      els.saveAvailability.addEventListener("click", async () => {
+        try {
+          const draft = readAvailabilityForm();
+          const errors = validateAvailabilityDraft(draft);
+          if (errors.length) {
+            throw new Error(errors[0]);
+          }
+
+          const response = await fetch("/api/availability", {
+            method: "POST",
+            headers: apiHeaders(),
+            body: JSON.stringify(draft),
+          });
+
+          if (!response.ok) {
+            throw new Error("Les disponibilités contiennent une erreur.");
+          }
+
+          state.availability = await response.json();
+          renderAvailability();
+          setFeedback("Disponibilités sauvegardées.", "success");
+        } catch (error) {
+          setFeedback(error.message, "error");
+        }
+      });
+
+      if (state.password) {
+        loadDashboard().catch(() => setFeedback("Session locale expirée. Entre le mot de passe.", "error"));
+      }
+    </script>
+  </body>
+</html>
