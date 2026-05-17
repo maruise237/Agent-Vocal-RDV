@@ -2,6 +2,7 @@ from typing import Any
 from urllib.parse import quote
 
 import httpx
+from fastapi import HTTPException, status
 
 
 class AirtableClient:
@@ -59,5 +60,14 @@ class AirtableClient:
             headers={"Authorization": f"Bearer {self.api_key}"},
             **kwargs,
         )
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=(
+                    "Airtable est inaccessible ou mal configuré. "
+                    "Vérifie AIRTABLE_API_KEY, AIRTABLE_BASE_ID et les noms de tables."
+                ),
+            ) from exc
         return response.json()
