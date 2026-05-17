@@ -134,6 +134,11 @@ Le mot de passe par défaut est `change-me`.
 
 Dans Dokploy, crée une application Docker/Git qui build ce dossier avec le `Dockerfile`.
 
+Si Dokploy utilise Nixpacks/buildpack au lieu du Dockerfile, le projet fournit aussi :
+
+- `Procfile`
+- `nixpacks.toml`
+
 Configuration minimale :
 
 ```env
