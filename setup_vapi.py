@@ -5,6 +5,10 @@ import httpx
 
 
 VAPI_BASE_URL = "https://api.vapi.ai"
+DEFAULT_VAPI_MODEL_PROVIDER = "deep-seek"
+DEFAULT_VAPI_MODEL_NAME = "deepseek-chat"
+DEFAULT_VAPI_VOICE_PROVIDER = "vapi"
+DEFAULT_VAPI_VOICE_ID = "Clara"
 
 
 class VapiClient:
@@ -54,6 +58,7 @@ def build_assistant_payload(
     company_description: str,
     first_message: str,
     webhook_url: str,
+    voice_provider: str,
     voice_id: str,
     model_provider: str,
     model_name: str,
@@ -120,9 +125,8 @@ def build_assistant_payload(
             ],
         },
         "voice": {
-            "provider": "11labs",
+            "provider": voice_provider,
             "voiceId": voice_id,
-            "model": "eleven_multilingual_v2",
         },
         "transcriber": {
             "provider": "deepgram",
@@ -145,9 +149,10 @@ def main() -> None:
             "Bonjour, je suis l'assistant de rendez-vous. Comment puis-je vous aider ?",
         ),
         webhook_url=os.environ["WEBHOOK_URL"],
-        voice_id=os.environ.get("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM"),
-        model_provider=os.environ.get("VAPI_MODEL_PROVIDER", "deepseek"),
-        model_name=os.environ.get("VAPI_MODEL_NAME", "deepseek-v4-flash"),
+        voice_provider=os.environ.get("VAPI_VOICE_PROVIDER", DEFAULT_VAPI_VOICE_PROVIDER),
+        voice_id=os.environ.get("VAPI_VOICE_ID", DEFAULT_VAPI_VOICE_ID),
+        model_provider=os.environ.get("VAPI_MODEL_PROVIDER", DEFAULT_VAPI_MODEL_PROVIDER),
+        model_name=os.environ.get("VAPI_MODEL_NAME", DEFAULT_VAPI_MODEL_NAME),
     )
 
     assistant = VapiClient(private_key).create_assistant(payload)

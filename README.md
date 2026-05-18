@@ -148,9 +148,10 @@ VAPI_PUBLIC_KEY=ta-cle-publique-vapi
 WEBHOOK_URL=https://ton-domaine.com/webhook
 COMPANY_DESCRIPTION=Entreprise qui reçoit des demandes de rendez-vous par téléphone.
 AGENT_FIRST_MESSAGE=Bonjour, je suis l'assistant de rendez-vous. Comment puis-je vous aider ?
-ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
-VAPI_MODEL_PROVIDER=deepseek
-VAPI_MODEL_NAME=deepseek-v4-flash
+VAPI_VOICE_PROVIDER=vapi
+VAPI_VOICE_ID=Clara
+VAPI_MODEL_PROVIDER=deep-seek
+VAPI_MODEL_NAME=deepseek-chat
 AIRTABLE_API_KEY=ton-token-airtable
 AIRTABLE_BASE_ID=appxxxxxxxxxxxxxx
 AIRTABLE_APPOINTMENTS_TABLE=Rendez-vous
@@ -188,7 +189,9 @@ py -3.11 setup_vapi.py
 Le script crée un assistant avec :
 
 - modèle configurable via `VAPI_MODEL_PROVIDER` et `VAPI_MODEL_NAME`
-- par défaut : `deepseek` / `deepseek-v4-flash`
+- par défaut : `deep-seek` / `deepseek-chat`
+- voix configurable via `VAPI_VOICE_PROVIDER` et `VAPI_VOICE_ID`
+- par défaut : `vapi` / `Clara`, adaptée à un usage sans clé ElevenLabs séparée
 - transcription Deepgram `nova-2` en français
 - voix ElevenLabs `eleven_multilingual_v2`
 - tools `verifier_disponibilites` et `reserver_creneau`

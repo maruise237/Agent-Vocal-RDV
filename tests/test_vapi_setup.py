@@ -1,6 +1,23 @@
 import httpx
 
-from setup_vapi import VapiClient, build_assistant_payload
+from setup_vapi import (
+    DEFAULT_VAPI_MODEL_NAME,
+    DEFAULT_VAPI_MODEL_PROVIDER,
+    DEFAULT_VAPI_VOICE_ID,
+    DEFAULT_VAPI_VOICE_PROVIDER,
+    VapiClient,
+    build_assistant_payload,
+)
+
+
+def test_default_vapi_model_matches_vapi_deepseek_identifiers():
+    assert DEFAULT_VAPI_MODEL_PROVIDER == "deep-seek"
+    assert DEFAULT_VAPI_MODEL_NAME == "deepseek-chat"
+
+
+def test_default_vapi_voice_uses_included_vapi_voice():
+    assert DEFAULT_VAPI_VOICE_PROVIDER == "vapi"
+    assert DEFAULT_VAPI_VOICE_ID == "Clara"
 
 
 def test_build_assistant_payload_contains_webhook_and_tools():
@@ -9,6 +26,7 @@ def test_build_assistant_payload_contains_webhook_and_tools():
         company_description="Agence IA locale",
         first_message="Bonjour, comment puis-je vous aider ?",
         webhook_url="https://agent.example.com/webhook",
+        voice_provider="vapi",
         voice_id="voice-123",
         model_provider="deepseek",
         model_name="deepseek-v4-flash",
@@ -20,6 +38,7 @@ def test_build_assistant_payload_contains_webhook_and_tools():
     assert payload["serverUrl"] == "https://agent.example.com/webhook"
     assert payload["model"]["provider"] == "deepseek"
     assert payload["model"]["model"] == "deepseek-v4-flash"
+    assert payload["voice"]["provider"] == "vapi"
     assert payload["voice"]["voiceId"] == "voice-123"
     assert "verifier_disponibilites" in tool_names
     assert "reserver_creneau" in tool_names
